@@ -1,0 +1,67 @@
+# 这是一个参数文件
+# 去你妹的yaml! 我再也不用yaml了！简简单单多好！
+
+#程序运行参数calib，rectify，reconstruct，process
+processType=reconstruct
+
+#====================立体标定参数=====================================
+###图像序列列表#calib_image/imagelist.xml
+imagepath=../image/cam_image/imagelist_sample.xml
+
+###立体标定参数保存文件目录stereoCalib.yml
+stereocalib_path=../params/stereo.yml
+
+###棋盘格长宽大小参数
+cornerX=9
+cornerY=6
+squareSize=21
+#====================立体标定参数=====================================
+
+#=============立体校正参数============================================
+###校正参数计算后测试图像
+image1_test=../image/cam_image/left/left01.jpg
+image2_test=../image/cam_image/right/right01.jpg
+
+###立体校正参数 RECTIFY_HARTLEY，RECTIFY_BOUGUET
+rectifymethod=RECTIFY_BOUGUET
+
+###立体校正参数保存文件
+rectifyParams_path=../params/rectify_camera.yml
+#=============立体校正参数============================================
+
+#================立体重建参数=========================================
+###起始与终止索引
+start_index=100
+end_index=100
+
+###数据所在目录，及图像名称前缀和后缀
+img_left=../sunny_day/sunny_day-img-left/image_00000
+left_extension=_0.png
+img_right=../sunny_day/sunny_day-img-right/image_00000
+right_extension=_1.png
+
+###视差计算算法 BM SGBM VAR ELAS
+DisparityType=ELAS
+#================立体重建参数=========================================
+
+#================数据源==============================================
+#三种数据源：image，camera，video
+file_type=image
+
+image1_dir=../test_images/1_src.png
+image2_dir=../test_images/2_src.png
+
+camera1=0
+camera2=1
+
+video1_dir=../test_images/Megamind.avi
+video2_dir=../test_images/Megamind1.avi
+
+
+# part 4 里定义的参数
+# 特征类型
+detector=ORB
+descriptor=ORB
+# 筛选good match的倍数
+good_match_threshold=4
+
