@@ -9,6 +9,7 @@
 #include <opencv2/nonfree/nonfree.hpp>
 #include <pcl/common/common_headers.h>
 #include <pcl/io/io.h>
+#include <pcl/io/pcd_io.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
 #include "../basefunc/basefunc.h"
@@ -37,6 +38,36 @@ typedef struct _RemapMatrixs
     cv::Mat        Calib_Mask_Roi;		// 左视图校正后的有效区域
 }RemapMatrixs;
 
+typedef struct _SgbmParams
+{
+    int sad_window_size;                  // 3 - 11
+    int sad_window_size_max;
+    int P1;                              // 70
+    int P1_max;
+    int P2;                             // 800
+    int P2_max;
+    int frame_num;
+    int frame_num_max;
+    int pre_filter_cap;                  // 70
+    int pre_filter_cap_max;
+    int min_disparity;
+    int min_disparity_max;
+    //int number_of_disparities;          // or 256 max
+    int number_of_disparities;          // or 256 max
+    int number_of_disparities_max;
+    int uniqueness_ratio;                 // 0 - 15
+    int uniqueness_ratio_max;
+    int speckle_window_size;            // 100
+    int speckle_window_size_max;
+    int speckle_range;
+    int speckle_range_max;
+    int disp12_max_diff;                 // 1
+    int disp12_max_diff_max;
+    int full_dp;
+    int full_dp_max;
+
+}SgbmParams;
+
 
 class stereoReconstruction
 {
@@ -63,6 +94,8 @@ public:
     cv::StereoVar		var;			// 立体匹配 VAR 方法
     double				FL;				// 左摄像机校正后的焦距值
     enum { STEREO_BM=0, STEREO_SGBM=1, STEREO_HH=2, STEREO_VAR=3 };
+
+    SgbmParams sgbmParams;
 
     int ViewWidth;                   // 视场宽度
     int ViewHeight;                  // 视场高度

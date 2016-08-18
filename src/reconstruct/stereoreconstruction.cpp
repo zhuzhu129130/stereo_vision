@@ -6,6 +6,30 @@ stereoReconstruction::stereoReconstruction()
     ViewHeight = 400;
     ViewDepth = 400;
     numberOfDisparies = 0;
+
+    sgbmParams.sad_window_size = 5;                  // 3 - 11
+    sgbmParams.sad_window_size_max = 11;
+    sgbmParams.P1 = 600;                              // 70
+    sgbmParams.P1_max = 2000;
+    sgbmParams.P2 = 2400;                             // 800
+    sgbmParams.P2_max = 10000;
+    sgbmParams.pre_filter_cap = 63;                  // 70
+    sgbmParams.pre_filter_cap_max = 200;
+    sgbmParams.min_disparity = 2;
+    sgbmParams.min_disparity_max = 20;
+    //sgbmParams.number_of_disparities = 128;          // or 256 max
+    sgbmParams.number_of_disparities = 32;          // or 256 max
+    sgbmParams.number_of_disparities_max = 256;
+    sgbmParams.uniqueness_ratio = 2;                 // 0 - 15
+    sgbmParams.uniqueness_ratio_max = 40;
+    sgbmParams.speckle_window_size = 100;            // 100
+    sgbmParams.speckle_window_size_max = 500;
+    sgbmParams.speckle_range = 32;
+    sgbmParams.speckle_range_max = 128;
+    sgbmParams.disp12_max_diff = 1;                 // 1
+    sgbmParams.disp12_max_diff_max = 20;
+    sgbmParams.full_dp = 0;
+    sgbmParams.full_dp_max = 1;
 }
 
 /*----------------------------
@@ -190,7 +214,8 @@ void stereoReconstruction::reproject(cv::Mat& disp8u, cv::Mat& img, pcl::PointCl
     ptr = point_cloud_ptr;
     ptr->width = (int) ptr->points.size();
     ptr->height = 1;
-    //pcl::io::savePCDFile("pcl.pcd", *ptr);
+    pcl::io::savePCDFile("pcl.pcd", *ptr);
+    //pcl::io::savePCDFileASCII("pcl.pcd", *ptr);
 }
 
 double stereoReconstruction::getDepth(int startx, int starty, int endx, int endy)
@@ -545,6 +570,7 @@ int stereoReconstruction::bmMatch(cv::Mat& imgleft, cv::Mat& imgright,RemapMatri
     return 1;
 }
 
+
 /*----------------------------
  * 功能 : 基于 SGBM 算法计算视差
  *----------------------------
@@ -572,7 +598,7 @@ int stereoReconstruction::sgbmMatch(cv::Mat& imgleft, cv::Mat& imgright,RemapMat
     imgleft.copyTo(img1proc);
     imgright.copyTo(img2proc);*/
 
-    SADWindowSize = 7;
+    /*SADWindowSize = 7;
     sgbm.preFilterCap = 63;
     sgbm.SADWindowSize = SADWindowSize > 0 ? SADWindowSize : 3; //3-11
 
@@ -586,7 +612,7 @@ int stereoReconstruction::sgbmMatch(cv::Mat& imgleft, cv::Mat& imgright,RemapMat
     sgbm.speckleWindowSize = 100; //200
     sgbm.speckleRange = 32;
     sgbm.disp12MaxDiff = -1;
-    sgbm.fullDP = (runParams.DisparityType == "STEREO_HH");
+    sgbm.fullDP = (runParams.DisparityType == "STEREO_HH");*/
 
     // 校正图像，使左右视图行对齐
     cv::remap(imgleft, img1remap, remapMat.Calib_mX_L, remapMat.Calib_mY_L, cv::INTER_LINEAR);		// 对用于视差计算的画面进行校正

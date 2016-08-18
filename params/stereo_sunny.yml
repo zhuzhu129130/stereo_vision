@@ -1,0 +1,47 @@
+%YAML:1.0
+calibrationDate: "Sun Apr 17 16:49:57 2016\n"
+num_boards: 14
+imageSize:
+   - 640
+   - 480
+# flags: + use_intrinsic_guess
+stereoCalibrateFlags: 1
+leftCameraMatrix: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 4.999227269272732e+02, 0., 3.195850778985193e+02, 0.,
+       4.996147788074767e+02, 2.473568676189872e+02, 0., 0., 1. ]
+leftDistortCoefficients: !!opencv-matrix
+   rows: 1
+   cols: 8
+   dt: d
+   data: [  -2.28883043479116e-01, 1.18796892493508e-01, 0., 0.,
+       0, 0., 0., 0. ]
+rightCameraMatrix: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 4.996548110675932e+02, 0., 3.078663666109500e+02, 0.,
+       4.992777002132757e+02, 2.338908754867127e+02, 0., 0., 1. ]
+rightDistortCoefficients: !!opencv-matrix
+   rows: 1
+   cols: 8
+   dt: d
+   data: [ -2.33667402919539e-01, 1.32068238932958e-01, 0., 0.,
+       0, 0., 0., 0. ]
+rotationMatrix: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 9.94722424575135e-01, 8.271026929669e-03,
+       1.02268705677217e-01, -8.805703908382e-03,
+       9.99949814849582e-01, 4.777798757326e-03,
+       -1.02224056004653e-01, -5.653131505306e-03,
+       9.94745336494794e-01 ]
+translationVector: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ -3.99999676570766894e+02, 5.15452497110021e-01,
+       2.0398508543001068e+01 ]

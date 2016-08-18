@@ -41,7 +41,7 @@ img_right=../sunny_day/sunny_day-img-right/image_00000
 right_extension=_1.png
 
 ###视差计算算法 BM SGBM VAR ELAS
-DisparityType=ELAS
+DisparityType=SGBM
 #================立体重建参数=========================================
 
 #================数据源==============================================

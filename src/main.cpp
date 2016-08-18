@@ -27,6 +27,11 @@ static void onMouse(int event, int x, int y, int flags, void*);
 cv::Mat disp8u;
 stereoReconstruction *ss;
 
+void createBarSgbm(SgbmParams& sgbmParams);
+
+void updateSgbmParameters(cv::StereoSGBM& sgbm,SgbmParams& sgbmParams);
+
+
 boost::shared_ptr<pcl::visualization::PCLVisualizer> createVisualizer (pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud) {
     boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
     viewer->setBackgroundColor (255, 255, 255);
@@ -191,28 +196,34 @@ int main()
 
         else if(runParams.file_type == "image")
         {
-            img_left = cv::imread(runParams.image1_test);
-            img_right = cv::imread(runParams.image2_test);
-            //cv::imshow("left",img_left);
-            //cv::imshow("right",img_right);
-            //cv::waitKey(1);
+            updateSgbmParameters(ss->sgbm,ss->sgbmParams);
+            //createBarSgbm(ss->sgbmParams);
+            while(1)
+            {
+                img_left = cv::imread(runParams.image1_test);
+                img_right = cv::imread(runParams.image2_test);
+                //cv::imshow("left",img_left);
+                //cv::imshow("right",img_right);
+                //cv::waitKey(1);
 
-            ss->loadRectifyDatas(runParams.rectifyParams_path);
-            //sr.remapImage(img_left,img_right,remapMat,"RECTIFY_BOUGUET");
-            ss->Disp_compute(img_left,img_right,runParams);
-            ss->reproject(ss->disp8u, img_left, point_cloud_ptr);
-            cout << "PointCloud size: "<< point_cloud_ptr->size()<<"\n";
+                ss->loadRectifyDatas(runParams.rectifyParams_path);
+                //sr.remapImage(img_left,img_right,remapMat,"RECTIFY_BOUGUET");
+                ss->Disp_compute(img_left,img_right,runParams);
+                ss->reproject(ss->disp8u, img_left, point_cloud_ptr);
+                cout << "PointCloud size: "<< point_cloud_ptr->size()<<"\n";
 
-            disp8u = ss->disp8u;
-            imshow("disparity", ss->disp8u);
+                disp8u = ss->disp8u;
+                imshow("disparity", ss->disp8u);
 
-            pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(point_cloud_ptr);
-            viewer->updatePointCloud<pcl::PointXYZRGB> (point_cloud_ptr, rgb, "reconstruction");
-            viewer->spinOnce();
+                pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(point_cloud_ptr);
+                viewer->updatePointCloud<pcl::PointXYZRGB> (point_cloud_ptr, rgb, "reconstruction");
+                viewer->spinOnce();
 
-            cv::waitKey(0);
-            t = cv::getTickCount() - t;
-            cout<<"Time elapsed: "<< t*1000/cv::getTickFrequency() <<endl;
+                cv::waitKey(1);
+                t = cv::getTickCount() - t;
+                cout<<"Time elapsed: "<< t*1000/cv::getTickFrequency() <<endl;
+            }
+
         }
 
         delete ss;
@@ -260,6 +271,56 @@ static void onMouse(int event, int x, int y, int flags, void*) {
         ss->getDepth(startx, starty, endx, endy);
     }
 }
+
+void updateSgbmParameters(cv::StereoSGBM& sgbm,SgbmParams& sgbmParams)
+{
+    if(sgbmParams.P2 <= sgbmParams.P1) {
+      sgbmParams.P2 = sgbmParams.P1 + 1;
+      cout << "Warning: P2 too small! Using P2 = " << sgbmParams.P2 << "\n";
+    }
+    int residue = sgbmParams.number_of_disparities % 16;
+    if(residue != 0) {
+      sgbmParams.number_of_disparities += (16 - residue);
+      std::cout << "Warning: number_of_disparities \% 16 != 0! Using number_of_disparities = " << sgbmParams.number_of_disparities << "\n";
+    }
+    sgbm.preFilterCap = sgbmParams.pre_filter_cap;
+    sgbm.SADWindowSize = sgbmParams.sad_window_size;
+    sgbm.P1 = sgbmParams.P1;
+    sgbm.P2 = sgbmParams.P2;
+    sgbm.minDisparity = sgbmParams.min_disparity;
+    sgbm.numberOfDisparities = sgbmParams.number_of_disparities;
+    sgbm.uniquenessRatio = sgbmParams.uniqueness_ratio;
+    sgbm.speckleWindowSize = sgbmParams.speckle_window_size;
+    sgbm.speckleRange = sgbmParams.speckle_range;
+    sgbm.disp12MaxDiff = sgbmParams.disp12_max_diff;
+    sgbm.fullDP = sgbmParams.full_dp;
+}
+
+void on_trackbar(int, void*)
+{
+    if(runParams.DisparityType == "SGBM")
+        updateSgbmParameters(ss->sgbm,ss->sgbmParams);
+    //else if()
+}
+
+void createBarSgbm(SgbmParams& sgbmParams)
+{
+    cv::namedWindow("Parameters");
+    cv::createTrackbar("preFilterCap", "Parameters", &sgbmParams.pre_filter_cap, sgbmParams.pre_filter_cap_max, on_trackbar);
+    cv::createTrackbar("SADWindowSize", "Parameters", &sgbmParams.sad_window_size, sgbmParams.sad_window_size_max, on_trackbar);
+    cv::createTrackbar("P1", "Parameters", &sgbmParams.P1, sgbmParams.P1_max, on_trackbar);
+    cv::createTrackbar("P2", "Parameters", &sgbmParams.P2, sgbmParams.P2_max, on_trackbar);
+    cv::createTrackbar("minDisparity", "Parameters", &sgbmParams.min_disparity, sgbmParams.min_disparity_max, on_trackbar);
+    cv::createTrackbar("numberOfDisparities", "Parameters", &sgbmParams.number_of_disparities, sgbmParams.number_of_disparities_max, on_trackbar);
+    cv::createTrackbar("uniquenessRatio", "Parameters", &sgbmParams.uniqueness_ratio, sgbmParams.uniqueness_ratio_max, on_trackbar);
+    cv::createTrackbar("speckleWindowSize", "Parameters", &sgbmParams.speckle_window_size, sgbmParams.speckle_window_size_max, on_trackbar);
+    cv::createTrackbar("speckleRange", "Parameters", &sgbmParams.speckle_range, sgbmParams.speckle_range_max, on_trackbar);
+    cv::createTrackbar("disp12MaxDiff", "Parameters", &sgbmParams.disp12_max_diff, sgbmParams.disp12_max_diff_max, on_trackbar);
+    cv::createTrackbar("fullDP", "Parameters", &sgbmParams.full_dp, sgbmParams.full_dp_max, on_trackbar);
+    cv::imshow("Parameters", cv::Mat::zeros(1, 1400, CV_8U));
+}
+
+
 
 
 
